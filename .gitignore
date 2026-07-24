@@ -1,0 +1,121 @@
+# User-specified
+.claude
+# root-level scratch skills dir only — NOT the workshop ADK Skill
+# under workshop/starter/agents/copywriter/skills (which must be tracked)
+/skills/
+.env
+refs/
+prez_youtube/
+medium/
+a2a-inspector/
+workshop/conference-submission.md
+workshop/PUBLISH.md
+workshop/ai-creative-studio-adk-a2a
+workshop/export.sh
+workshop/index.lab.md
+workshop/inject_about.py
+CONTRIBUTIONS.md
+blog.md
+/diagrams/
+workshop/diagrams/ai-creative-studio-architecture.drawio
+
+# Local test/scratch files
+test_*_local.py
+test_local_*.py
+prompt_test.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+*.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# API Keys and Secrets
+secrets/
+*.key
+*.pem
+credentials.json
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Videos
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# Large animated demo GIFs (too big for git; keep locally or host elsewhere)
+*.gif
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+.cache/

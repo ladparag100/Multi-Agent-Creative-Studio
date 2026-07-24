@@ -86,6 +86,7 @@ secrets/
 *.key
 *.pem
 credentials.json
+.streamlit/secrets.toml
 
 # Testing
 .pytest_cache/

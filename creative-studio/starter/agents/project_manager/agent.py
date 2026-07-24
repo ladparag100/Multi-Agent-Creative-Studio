@@ -93,26 +93,43 @@ Director), add them to the Notion project page body as a bulleted list under a
         else ""
     )
 
-    # TODO 1: Write the system instruction for the Project Manager.
-    # It should:
-    #   - Use today's date as the starting point for all timelines
-    #   - Break campaigns into phases: Strategy, Creation, Review, Launch
-    #   - Create tasks with owners and deadlines
-    #   - ALWAYS provide a text timeline first (primary deliverable)
-    #   - Use {notion_section} to optionally include Notion guidance
-    #
-    # Required text output format:
-    #   **Project Timeline:** [phases with dates from today]
-    #   **Task List:** [Task | Owner | Deadline | Status]
-    #   **Budget Breakdown:** [by category]
-    #   **Milestones:** [key checkpoints]
-    #   **Notion Status:** ["Project created..." or "Notion not configured - text timeline only"]
-    #
-    # Today's date: {datetime.date.today().strftime("%B %d, %Y")}
-    return f"""
-# TODO 1: Write the Project Manager system instruction here
+    return f"""You are an expert Project Manager for social media campaign execution.
 
-Today's date: {datetime.date.today().strftime("%B %d, %Y")}
+Today's date is: {datetime.date.today().strftime("%B %d, %Y")}. Use this as the starting
+point for every timeline you build - all dates must be calculated forward from today.
+
+Given a completed campaign (strategy, copy, visuals, and critic feedback), your task is to:
+1. Break the campaign into phases: Strategy, Creation, Review, Launch - with concrete start
+   and end dates for each phase, counted forward from today.
+2. Create a detailed task list with an owner (role, e.g. Brand Strategist, Copywriter,
+   Designer, Critic, or "Marketing Team") and a deadline for each task.
+3. Break down the budget (if provided) by category (e.g. content production, paid promotion,
+   tools/software, contingency).
+4. Define key milestones - checkpoints where the team should confirm progress before moving
+   to the next phase.
+
+ALWAYS provide the text timeline first - it is the primary deliverable and must always be
+produced, whether or not Notion is configured.
+
+Required text output format - use this EXACTLY:
+
+**Project Timeline:**
+[Phases with start/end dates, calculated from today]
+
+**Task List:**
+| Task | Owner | Deadline | Status |
+|------|-------|----------|--------|
+[one row per task]
+
+**Budget Breakdown:**
+[By category, or "No budget provided" if none was given]
+
+**Milestones:**
+[Key checkpoints with target dates]
+
+**Notion Status:**
+[If Notion tools are available: report whether the project and tasks were created
+successfully. If Notion tools are not available: "Notion not configured - text timeline only"]
 {notion_section}
 """
 
@@ -126,40 +143,39 @@ def create_project_manager_agent():
     if not notion_token or not notion_project_db_id or not notion_tasks_db_id:
         logger.warning("Notion credentials not set — running without Notion integration")
 
-        # TODO 2: Create and return an Agent without tools
-        # Use name="project_manager", model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         return Agent(
             name="project_manager",
             model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
             generate_content_config=GENERATE_CONTENT_CONFIG,
-            # TODO 2: add instruction=get_system_instruction()
-            # TODO 2: add description=
+            instruction=get_system_instruction(),
+            description="Project manager for campaign timelines, task lists, and budget breakdowns",
         )
 
     else:
         logger.info(f"Notion configured — projects database: {notion_project_db_id}, tasks database: {notion_tasks_db_id}")
 
-        # TODO 3: Create the MCP toolset for Notion
-        # Hint: import McpToolset, StdioConnectionParams from google.adk.tools.mcp_tool
-        #       import StdioServerParameters from mcp
-        #
-        # server_params = StdioServerParameters(
-        #     command="notion-mcp-server",
-        #     env={"NOTION_TOKEN": notion_token, "PATH": os.environ.get("PATH", "")}
-        # )
-        # notion_toolset = McpToolset(
-        #     connection_params=StdioConnectionParams(server_params=server_params, timeout=30.0)
-        # )
+        from google.adk.tools.mcp_tool import McpToolset, StdioConnectionParams
+        from mcp import StdioServerParameters
 
-        # TODO 3: Create and return an Agent WITH the notion_toolset
+        server_params = StdioServerParameters(
+            command="notion-mcp-server",
+            env={"NOTION_TOKEN": notion_token, "PATH": os.environ.get("PATH", "")},
+        )
+        notion_toolset = McpToolset(
+            connection_params=StdioConnectionParams(server_params=server_params, timeout=30.0)
+        )
+
         return Agent(
             name="project_manager",
             model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
             generate_content_config=GENERATE_CONTENT_CONFIG,
             after_tool_callback=handle_notion_error,
-            # TODO 3: add instruction=get_system_instruction(project_database_id=notion_project_db_id, tasks_database_id=notion_tasks_db_id)
-            # TODO 3: add description=
-            # TODO 3: add tools=[notion_toolset]
+            instruction=get_system_instruction(
+                project_database_id=notion_project_db_id,
+                tasks_database_id=notion_tasks_db_id,
+            ),
+            description="Project manager for campaign timelines, task lists, budget breakdowns, and Notion sync",
+            tools=[notion_toolset],
         )
 
 

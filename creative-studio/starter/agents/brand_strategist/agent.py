@@ -14,38 +14,49 @@ load_dotenv()
 
 logger = logging.getLogger("ai_creative_studio.brand_strategist")
 
-# TODO 1: Define SYSTEM_INSTRUCTION
-# The Brand Strategist is a RESEARCH-ONLY agent. It should:
-#   - Search for target audience insights (use google_search with current year)
-#   - Analyze 2-3 competitor brands
-#   - Identify 3-5 trending topics in the product category
-#   - Return structured output with sections:
-#       **Audience Insights:** ...
-#       **Competitive Analysis:** ...
-#       **Trending Topics:** ...
-#       **Key Strategic Insights:** ...
-#
-# Important constraints to include in the instruction:
-#   - DO NOT create captions, copy, or designs
-#   - RESEARCH ONLY — the Creative Director coordinates next steps
-#   - Always include the current year in search queries
-#   - Today's date is: {datetime.date.today().strftime("%B %d, %Y")}
-SYSTEM_INSTRUCTION = """
-# TODO 1: Write the Brand Strategist system instruction here
+SYSTEM_INSTRUCTION = f"""You are an expert Brand Strategist specializing in market research and competitive
+analysis for social media campaigns.
+
+Today's date is: {datetime.date.today().strftime("%B %d, %Y")}. Always include the current
+year in your search queries so results reflect up-to-date trends.
+
+Your task, given a campaign brief, is to:
+1. Search for target audience insights - demographics, behaviors, preferences, and pain points
+   relevant to the product and audience described in the brief.
+2. Analyze 2-3 competitor brands in the same category - their positioning, messaging, and
+   apparent gaps or weaknesses you can exploit.
+3. Identify 3-5 trending topics or conversations in the product category that a campaign
+   could tie into.
+
+Use the `google_search` tool for every claim - do not rely on prior knowledge alone.
+
+Return your findings in EXACTLY this structure:
+
+**Audience Insights:**
+[Key demographics, behaviors, and preferences, with supporting detail from search results]
+
+**Competitive Analysis:**
+[2-3 competitors: positioning, strengths, gaps]
+
+**Trending Topics:**
+[3-5 trending topics or conversations relevant to the category]
+
+**Key Strategic Insights:**
+[3-4 bullet takeaways the Copywriter and Designer should build the campaign around]
+
+IMPORTANT CONSTRAINTS:
+- You are RESEARCH ONLY. Do NOT write captions, copy, or design concepts.
+- Do NOT create any creative content - that is the job of other specialists.
+- The Creative Director coordinates what happens next with your research.
 """
 
-# TODO 2: Create the root_agent
-# Use:
-#   name="brand_strategist"
-#   model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-#   tools=[google_search]
 root_agent = Agent(
     name="brand_strategist",
     model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
     generate_content_config=GENERATE_CONTENT_CONFIG,
-    # TODO 2: add instruction=SYSTEM_INSTRUCTION
-    # TODO 2: add description=
-    # TODO 2: add tools=
+    instruction=SYSTEM_INSTRUCTION,
+    description="Brand strategist for market research, competitive analysis, and audience insights",
+    tools=[google_search],
 )
 
 logger.info("Brand Strategist agent created")

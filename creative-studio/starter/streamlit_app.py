@@ -9,19 +9,22 @@ Local dev (specialists as local A2A servers):
     ./run_local_agents.sh
 
 Streamlit Community Cloud (specialists deployed to Cloud Run):
-    Set GOOGLE_CLOUD_PROJECT, GCS_IMAGES_BUCKET, the 5 *_AGENT_URL values, and
-    a [gcp_service_account] table in the app's Secrets - see
-    .streamlit/secrets.toml.example.
+    Set GOOGLE_API_KEY (from aistudio.google.com/apikey), GOOGLE_GENAI_USE_VERTEXAI=0,
+    and the 5 *_AGENT_URL values in the app's Secrets - see
+    .streamlit/secrets.toml.example. Generated images are read from a
+    public-read GCS bucket over plain HTTPS, so no GCP credentials are
+    needed on this side at all (only the Cloud Run specialists need GCP
+    auth, and Cloud Run already gives them that for free via their
+    attached service account).
 """
 
 import asyncio
-import json
 import os
 import sys
-import tempfile
 import uuid
 from pathlib import Path
 
+import requests
 import streamlit as st
 from dotenv import load_dotenv
 
@@ -30,16 +33,17 @@ load_dotenv()
 
 
 def _load_secrets_into_env():
-    """On Streamlit Community Cloud there's no .env and no interactive gcloud
-    login - config and a GCP service account key come from st.secrets instead.
-    Copy them into the process environment before any agent module is
-    imported. No-op locally when no secrets.toml exists (.env covers that)."""
+    """On Streamlit Community Cloud there's no .env - config comes from
+    st.secrets instead. Copy it into the process environment before any
+    agent module is imported. No-op locally when no secrets.toml exists
+    (.env covers that)."""
     try:
         secrets = st.secrets
     except Exception:
         return
 
     for key in (
+        "GOOGLE_API_KEY", "GOOGLE_GENAI_USE_VERTEXAI",
         "GOOGLE_CLOUD_PROJECT", "GOOGLE_CLOUD_LOCATION", "GEMINI_MODEL",
         "GEMINI_IMAGE_MODEL", "GCS_IMAGES_BUCKET", "SIGNING_SERVICE_ACCOUNT",
         "STRATEGIST_AGENT_URL", "COPYWRITER_AGENT_URL", "DESIGNER_AGENT_URL",
@@ -48,12 +52,6 @@ def _load_secrets_into_env():
     ):
         if key in secrets:
             os.environ[key] = str(secrets[key])
-
-    if "gcp_service_account" in secrets:
-        os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "1"
-        creds_path = Path(tempfile.gettempdir()) / "gcp_service_account.json"
-        creds_path.write_text(json.dumps(dict(secrets["gcp_service_account"])))
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(creds_path)
 
 
 _load_secrets_into_env()
@@ -113,8 +111,6 @@ def get_runner():
 
 
 def check_agent(url: str) -> bool:
-    import requests
-
     try:
         resp = requests.get(f"{url}/.well-known/agent.json", timeout=1.5)
         return resp.status_code == 200
@@ -122,15 +118,16 @@ def check_agent(url: str) -> bool:
         return False
 
 
-@st.cache_data(ttl=10, show_spinner=False)
-def fetch_image_bytes(gcs_uri: str):
-    from google.cloud import storage as gcs
-
-    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+@st.cache_data(ttl=600, show_spinner=False)
+def fetch_image_bytes(gcs_uri: str) -> bytes:
+    """Fetch a generated image over plain HTTPS - the campaign-images bucket
+    is public-read, so no GCP credentials are needed here."""
     without_prefix = gcs_uri[len("gs://"):]
     bucket_name, blob_path = without_prefix.split("/", 1)
-    client = gcs.Client(project=project_id)
-    return client.bucket(bucket_name).blob(blob_path).download_as_bytes()
+    url = f"https://storage.googleapis.com/{bucket_name}/{blob_path}"
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    return resp.content
 
 
 def new_session():

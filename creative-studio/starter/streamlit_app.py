@@ -20,6 +20,7 @@ Streamlit Community Cloud (specialists deployed to Cloud Run):
 
 import asyncio
 import os
+import re
 import sys
 import uuid
 from pathlib import Path
@@ -78,6 +79,14 @@ AGENT_LABELS = {
     "critic": "Critic",
     "project_manager": "Project Manager",
 }
+
+# Transient A2A hiccups the Creative Director sometimes narrates even though it
+# retries and recovers on its own - strip these out so the visible chat only
+# shows things the user actually needs to know about.
+_TRANSIENT_RETRY_RE = re.compile(
+    r"^\s*[⚠️❕❔]*\s*.*\breturned an empty response\b.*\bretrying\b.*$",
+    re.IGNORECASE | re.MULTILINE,
+)
 
 EXAMPLE_BRIEF = """Create a complete Instagram campaign for:
 - Product: EcoFlow Smart Water Bottle (tracks hydration, keeps drinks cold 24h)
@@ -201,6 +210,7 @@ async def stream_campaign(runner, session_id, message_text, activity, live, acti
 
         if event.content and event.content.parts:
             text = "".join(p.text for p in event.content.parts if p.text)
+            text = _TRANSIENT_RETRY_RE.sub("", text).strip()
             if text.strip():
                 turn_content.append({"type": "text", "author": author, "text": text})
                 with live.container():

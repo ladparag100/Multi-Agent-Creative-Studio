@@ -90,7 +90,19 @@ EXAMPLE_BRIEF = """Create a complete Instagram campaign for:
 
 
 def run_async(coro):
-    return asyncio.run(coro)
+    """Run a coroutine on one event loop kept alive for this browser session.
+
+    get_runner() below is cached per-process, so the same RemoteA2aAgent
+    instances (and the async HTTP clients they lazily create) persist across
+    every message. asyncio.run() would close its loop after each call,
+    orphaning those clients and breaking every A2A request from the second
+    message onward ("Event loop is closed"). Reusing one loop per session
+    (Streamlit pins a session to one thread for its lifetime) keeps them
+    valid for as long as the session lasts.
+    """
+    if "event_loop" not in st.session_state or st.session_state.event_loop.is_closed():
+        st.session_state.event_loop = asyncio.new_event_loop()
+    return st.session_state.event_loop.run_until_complete(coro)
 
 
 @st.cache_resource(show_spinner=False)

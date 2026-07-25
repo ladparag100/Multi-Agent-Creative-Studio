@@ -238,17 +238,12 @@ with st.sidebar:
     for name, env_key, icon in SPECIALISTS:
         url = os.environ.get(env_key, "")
         if not url:
-            st.markdown(f"{icon} **{AGENT_LABELS[name]}** — not configured")
+            status = "⚪"
         elif check_agent(url):
-            st.markdown(f"{icon} **{AGENT_LABELS[name]}** — 🟢 online ({url})")
+            status = "🟢"
         else:
-            st.markdown(f"{icon} **{AGENT_LABELS[name]}** — 🔴 unreachable ({url})")
-
-    st.divider()
-    st.subheader("GCP config")
-    st.caption(f"Project: `{os.environ.get('GOOGLE_CLOUD_PROJECT', 'not set')}`")
-    st.caption(f"Location: `{os.environ.get('GOOGLE_CLOUD_LOCATION', 'not set')}`")
-    st.caption(f"Model: `{os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')}`")
+            status = "🔴"
+        st.markdown(f"{icon} {AGENT_LABELS[name]} {status}")
 
     st.divider()
     if st.button("🔄 New conversation", width="stretch"):

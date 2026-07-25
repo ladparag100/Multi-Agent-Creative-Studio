@@ -18,65 +18,76 @@ def get_image_links(gcs_uris: list[str]) -> dict:
         or {"status": "error", "error": "..."}
     """
     try:
-        from google.cloud import storage as gcs
-        import google.auth
+        # Try to sign real GCS URLs when GCP credentials are available (Cloud Run,
+        # Agent Engine, or local user ADC). If no credentials resolve at all - e.g.
+        # the Creative Director running off-GCP on Streamlit Cloud with only a
+        # Gemini API key - fall back to plain public URLs (the campaign-images
+        # bucket is public-read) instead of failing the whole tool call.
+        sign_credentials = None
+        sa_email = None
+        try:
+            from google.cloud import storage as gcs
+            import google.auth
 
-        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
-        client = gcs.Client(project=project_id)
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+            client = gcs.Client(project=project_id)
 
-        credentials, _ = google.auth.default()
+            credentials, _ = google.auth.default()
 
-        # Determine which SA email to sign as:
-        # - On Cloud Run / Agent Engine: Compute Engine credentials carry a service_account_email
-        # - Locally with user ADC: set SIGNING_SERVICE_ACCOUNT in .env
-        sa_email = os.environ.get("SIGNING_SERVICE_ACCOUNT") or getattr(
-            credentials, "service_account_email", None
-        )
-
-        # On Agent Runtime, service_account_email is "default" - resolve the real email
-        # from the GCP metadata server.
-        if sa_email == "default":
-            import urllib.request
-            req = urllib.request.Request(
-                "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email",
-                headers={"Metadata-Flavor": "Google"},
+            # Determine which SA email to sign as:
+            # - On Cloud Run / Agent Engine: Compute Engine credentials carry a service_account_email
+            # - Locally with user ADC: set SIGNING_SERVICE_ACCOUNT in .env
+            sa_email = os.environ.get("SIGNING_SERVICE_ACCOUNT") or getattr(
+                credentials, "service_account_email", None
             )
-            sa_email = urllib.request.urlopen(req, timeout=2).read().decode()
 
-        if sa_email:
-            # Use IAM Sign Blob API - works for all credential types (Compute Engine,
-            # Cloud Run, user ADC with impersonation). No private key needed.
-            from google.auth import iam as google_auth_iam
-            from google.auth.transport import requests as google_auth_requests
-            from google.oauth2 import service_account as sa_module
+            # On Agent Runtime, service_account_email is "default" - resolve the real email
+            # from the GCP metadata server.
+            if sa_email == "default":
+                import urllib.request
+                req = urllib.request.Request(
+                    "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email",
+                    headers={"Metadata-Flavor": "Google"},
+                )
+                sa_email = urllib.request.urlopen(req, timeout=2).read().decode()
 
-            request = google_auth_requests.Request()
-            credentials.refresh(request)
+            if sa_email:
+                # Use IAM Sign Blob API - works for all credential types (Compute Engine,
+                # Cloud Run, user ADC with impersonation). No private key needed.
+                from google.auth import iam as google_auth_iam
+                from google.auth.transport import requests as google_auth_requests
+                from google.oauth2 import service_account as sa_module
 
-            signer = google_auth_iam.Signer(
-                request=request,
-                credentials=credentials,
-                service_account_email=sa_email,
-            )
-            sign_credentials = sa_module.Credentials(
-                signer=signer,
-                service_account_email=sa_email,
-                token_uri="https://oauth2.googleapis.com/token",
-            )
-            use_signed = True
-        else:
-            use_signed = False
+                request = google_auth_requests.Request()
+                credentials.refresh(request)
+
+                signer = google_auth_iam.Signer(
+                    request=request,
+                    credentials=credentials,
+                    service_account_email=sa_email,
+                )
+                sign_credentials = sa_module.Credentials(
+                    signer=signer,
+                    service_account_email=sa_email,
+                    token_uri="https://oauth2.googleapis.com/token",
+                )
+        except Exception:
+            sign_credentials = None
+
+        use_signed = sign_credentials is not None
+        if use_signed:
+            client = gcs.Client(project=os.environ.get("GOOGLE_CLOUD_PROJECT"))
 
         links = []
         for uri in gcs_uris:
             without_prefix = uri[len("gs://"):]
             bucket_name, blob_path = without_prefix.split("/", 1)
-            blob = client.bucket(bucket_name).blob(blob_path)
 
             filename = blob_path.rsplit("/", 1)[-1]
             concept = re.sub(r"-[0-9a-f]{8}\.[^.]+$", "", filename)
 
             if use_signed:
+                blob = client.bucket(bucket_name).blob(blob_path)
                 url = blob.generate_signed_url(
                     version="v4",
                     expiration=timedelta(hours=1),

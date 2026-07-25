@@ -159,6 +159,22 @@ async def stream_campaign(runner, session_id, message_text, activity, live, acti
 
         for fc in event.get_function_calls():
             log(f"{icon} **{label}** → calling `{fc.name}`")
+            # display_image's own response has no gcs_uri (it just saves an ADK
+            # artifact, which this UI doesn't render) - the URI lives in the call
+            # arguments instead, so pull it from there to actually show the image.
+            if fc.name == "display_image" and fc.args and fc.args.get("gcs_uri"):
+                gcs_uri = fc.args["gcs_uri"]
+                item = {
+                    "type": "image",
+                    "author": author,
+                    "gcs_uri": gcs_uri,
+                    "caption": fc.args.get("concept_name", ""),
+                }
+                turn_content.append(item)
+                try:
+                    live.image(fetch_image_bytes(gcs_uri), caption=item["caption"])
+                except Exception as e:
+                    live.warning(f"Could not load image ({gcs_uri}): {e}")
 
         for fr in event.get_function_responses():
             resp = fr.response or {}
@@ -167,20 +183,6 @@ async def stream_campaign(runner, session_id, message_text, activity, live, acti
                 log(f"⚠️ **{label}** ← `{fr.name}` error: {resp.get('error')}")
             else:
                 log(f"✅ **{label}** ← `{fr.name}` done")
-
-            gcs_uri = resp.get("gcs_uri")
-            if gcs_uri:
-                item = {
-                    "type": "image",
-                    "author": author,
-                    "gcs_uri": gcs_uri,
-                    "caption": resp.get("concept_name", ""),
-                }
-                turn_content.append(item)
-                try:
-                    live.image(fetch_image_bytes(gcs_uri), caption=item["caption"])
-                except Exception as e:
-                    live.warning(f"Could not load image ({gcs_uri}): {e}")
 
         if event.partial:
             continue

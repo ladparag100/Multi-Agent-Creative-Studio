@@ -10,7 +10,7 @@ Examples of behavior that helps create a positive environment:
 
 - Being respectful of differing viewpoints and experiences.
 - Giving and gracefully accepting constructive feedback.
-- Focusing on what is best for the community and for learners using this project.
+- Focusing on what is best for the community and for people using this project.
 
 Examples of unacceptable behavior:
 

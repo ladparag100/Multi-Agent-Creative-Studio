@@ -3,16 +3,13 @@
 > Turn a single prompt into a complete Instagram campaign with a team of collaborating AI agents, built on Google's ADK, the A2A protocol, MCP, Cloud Run, and Vertex AI Agent Engine.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Codelab: live](https://img.shields.io/badge/codelab-live-success.svg)](https://ani-in.github.io/Multi-Agent-Creative-Studio/)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://github.com/ANI-IN/Multi-Agent-Creative-Studio)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://github.com/ladparag100/Multi-Agent-Creative-Studio)
 [![Built with Google ADK](https://img.shields.io/badge/built%20with-Google%20ADK-4285F4?logo=google&logoColor=white)](https://google.github.io/adk-docs/)
 [![Protocols: A2A + MCP](https://img.shields.io/badge/protocols-A2A%20%2B%20MCP-5f6368.svg)](https://github.com/a2aproject)
 
-> Build status / test coverage badges are intentionally omitted: this repository ships a pre-built static codelab and a teaching scaffold, so it has no CI pipeline or automated test suite (see [Intentionally not included](#intentionally-not-included)).
+> Build status / test coverage badges are intentionally omitted: this repository has no CI pipeline or automated test suite yet (see [Intentionally not included](#intentionally-not-included)).
 
-AI Creative Studio is a hands-on codelab and starter kit for building a **distributed, multimodal, multi-agent system**. You type one campaign idea, and six specialized agents collaborate over the network to return audience research, three caption variations, real generated images, a quality review, and a full project timeline. It is written for engineers who want to learn the modern Google agent stack by building a working system, not by reading slides.
-
-The published codelab is live at **https://ani-in.github.io/Multi-Agent-Creative-Studio/**.
+AI Creative Studio is a starter kit for building a **distributed, multimodal, multi-agent system**. You type one campaign idea, and six specialized agents collaborate over the network to return audience research, three caption variations, real generated images, a quality review, and a full project timeline.
 
 ## Table of Contents
 
@@ -69,22 +66,17 @@ AI Creative Studio models the creative team as software. Each role becomes an au
 
 ## Who It Is For and Use Cases
 
-This is a learning project first. It is for engineers and technical builders who want to understand multi-agent systems on Google Cloud by building one. Three realistic scenarios:
+It is for engineers and technical builders who want a concrete, end-to-end reference for multi-agent systems on Google Cloud. Two realistic scenarios:
 
-1. **The ADK learner.**
+1. **The ADK builder.**
    *Persona:* a backend or ML engineer new to agent frameworks.
    *Situation:* they have used a single LLM call but never wired several agents together, given them tools, or deployed them.
-   *Outcome:* by completing the codelab they build six agents, connect them over A2A, add a Skill and an MCP toolset, and deploy to Cloud Run and Agent Engine, ending with a working campaign generator.
+   *Outcome:* build six agents, connect them over A2A, add a Skill and an MCP toolset, and deploy to Cloud Run and Agent Engine, ending with a working campaign generator.
 
 2. **The platform engineer evaluating A2A and MCP.**
    *Persona:* a senior engineer deciding whether agent-to-agent and Model Context Protocol fit their stack.
    *Situation:* they need a concrete, end-to-end reference rather than a toy snippet.
    *Outcome:* they study how independent agents expose A2A endpoints, how the orchestrator wraps remote agents as tools, and how MCP connects an agent to Notion without custom glue code.
-
-3. **The workshop facilitator.**
-   *Persona:* a developer advocate or instructor running a hands-on session.
-   *Situation:* they want a 2 to 3 hour lab with a complete, scaffolded starter and a published guide.
-   *Outcome:* they run the live codelab, hand participants `workshop/starter/` with guided TODOs, and end with each attendee deploying a real distributed system.
 
 ## Key Features
 
@@ -107,9 +99,8 @@ This is a learning project first. It is for engineers and technical builders who
 
 ### Intentionally not included
 
-This repository is deliberately a teaching scaffold, not a turnkey product. By design it does **not** ship:
+This repository is deliberately a starter scaffold, not a turnkey product. By design it does **not** ship:
 
-- A finished, runnable agent implementation. The files in `workshop/starter/agents/` contain guided `# TODO` markers; the deploy scripts and infrastructure are complete, but the agent logic is what you write by following the codelab.
 - A CI pipeline or automated test suite (hence no build or coverage badges).
 - A web frontend of its own. You interact through ADK's dev UI, the deployed Agent Engine, or `run_campaign.py`.
 - A persistence layer beyond Cloud Storage for images and optional Notion for tasks.
@@ -118,15 +109,15 @@ This repository is deliberately a teaching scaffold, not a turnkey product. By d
 
 A full campaign generated end-to-end in the ADK dev UI:
 
-![Full campaign running in the ADK web UI](workshop/diagrams/adkweb-fullcampain.gif)
+![Full campaign running in the ADK web UI](creative-studio/diagrams/adkweb-fullcampain.gif)
 
 The same flow against the deployed system on Google Cloud:
 
-![Full campaign on Google Cloud](workshop/diagrams/GCP-fullcomapin.gif)
+![Full campaign on Google Cloud](creative-studio/diagrams/GCP-fullcomapin.gif)
 
 Inspecting a deployed agent's A2A agent card with the A2A Inspector:
 
-![Brand Strategist agent card in the A2A Inspector](workshop/diagrams/brandstrategist-agentcard.jpg)
+![Brand Strategist agent card in the A2A Inspector](creative-studio/diagrams/brandstrategist-agentcard.jpg)
 
 Example input and output:
 
@@ -196,7 +187,7 @@ sequenceDiagram
 
 A detailed infrastructure diagram (Cloud Run, Agent Engine, Cloud Storage, Secret Manager, Google Search, and the Notion MCP server) is included as an image:
 
-![System architecture](workshop/diagrams/ai-creative-studio-architecture.svg)
+![System architecture](creative-studio/diagrams/ai-creative-studio-architecture.svg)
 
 There is no separate `docs/architecture.md`; the diagrams above and the [Code Walkthrough](#code-walkthrough) are the architecture reference.
 
@@ -229,13 +220,13 @@ There is no separate `docs/architecture.md`; the diagrams above and the [Code Wa
 
 ## Installation
 
-The application code lives in `workshop/starter/`. Clone the repo and work from there.
+The application code lives in `creative-studio/starter/`.
 
 ### Local (virtual environment via `uv`)
 
 ```bash
-git clone https://github.com/ANI-IN/Multi-Agent-Creative-Studio.git
-cd Multi-Agent-Creative-Studio/workshop/starter
+git clone https://github.com/ladparag100/Multi-Agent-Creative-Studio.git
+cd Multi-Agent-Creative-Studio/creative-studio/starter
 
 # Install dependencies into a managed virtual environment
 uv sync
@@ -256,7 +247,7 @@ uv run adk web agents --allow_origins='*'
 Each specialist ships a Dockerfile (the orchestrator does not; it deploys to Agent Engine). The pattern is identical across specialists: `python:3.12-slim`, `uv sync`, a non-root user, and the agent's A2A server on port 8080.
 
 ```bash
-cd Multi-Agent-Creative-Studio/workshop/starter/agents/brand_strategist
+cd Multi-Agent-Creative-Studio/creative-studio/starter/agents/brand_strategist
 
 docker build -t brand-strategist .
 docker run --rm -p 8080:8080 \
@@ -270,7 +261,7 @@ For the full managed deployment (Cloud Run plus Agent Engine), see [Running the 
 
 ## Configuration
 
-Configuration is driven by `workshop/starter/.env` (copied from `.env.example`). The deploy scripts load it via `deploy/env_utils.py` (`load_env_file`, `env_utils.py:L27-L68`) and require at minimum a project and a region (`validate_required_vars`, `env_utils.py:L71-L92`).
+Configuration is driven by `creative-studio/starter/.env` (copied from `.env.example`). The deploy scripts load it via `deploy/env_utils.py` (`load_env_file`, `env_utils.py:L27-L68`) and require at minimum a project and a region (`validate_required_vars`, `env_utils.py:L71-L92`).
 
 | Variable | Configures | Default in `.env.example` | Sensitive |
 |---|---|---|---|
@@ -319,7 +310,7 @@ There are two ways to run it.
 **A. Locally in the ADK dev UI** (fastest for iterating on one agent):
 
 ```bash
-cd Multi-Agent-Creative-Studio/workshop/starter
+cd Multi-Agent-Creative-Studio/creative-studio/starter
 uv run adk web agents --allow_origins='*'
 ```
 
@@ -328,7 +319,7 @@ This serves the ADK web UI; pick an agent and chat with it. Specialists also sta
 **B. Fully deployed on Google Cloud** (the real distributed system):
 
 ```bash
-cd Multi-Agent-Creative-Studio/workshop/starter
+cd Multi-Agent-Creative-Studio/creative-studio/starter
 
 # 1) Deploy the 5 specialists to Cloud Run (sequential, to respect Cloud Build quota).
 #    Writes the *_AGENT_URL values back into .env.
@@ -352,19 +343,18 @@ bash deploy/teardown_gcp.sh   # interactive; asks for confirmation
 
 ## Using the App Step by Step
 
-This repository is the starter for a guided codelab. The recommended path:
+This repository is a starter kit. The recommended path:
 
-1. **Open the codelab.** Read the steps at https://ani-in.github.io/Multi-Agent-Creative-Studio/. It walks through each agent in order.
 2. **Configure your environment.** `cp .env.example .env`, fill in `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_PROJECT_NUMBER`, `CLOUD_RUN_REGION`, and `GCS_IMAGES_BUCKET`, then `gcloud auth application-default login`.
-3. **Build the agents.** Each `agents/<name>/agent.py` has numbered `# TODO` comments. Fill them in as the codelab directs: write the Brand Strategist instruction and add `google_search`; load the `instagram-copywriting` Skill into the Copywriter; implement the Designer's image-generation tool body; implement the Critic's image review; write the Project Manager instruction and optional Notion MCP toolset; and wire the Creative Director's remote A2A agents.
+3. **Build the agents.** Each `agents/<name>/agent.py` has numbered `# TODO` comments. Implement each one: write the Brand Strategist instruction and add `google_search`; load the `instagram-copywriting` Skill into the Copywriter; implement the Designer's image-generation tool body; implement the Critic's image review; write the Project Manager instruction and optional Notion MCP toolset; and wire the Creative Director's remote A2A agents.
 4. **Run a specialist locally** to check it: `uv run adk web agents --allow_origins='*'`.
 5. **Deploy.** Run the two deploy scripts (see [Running the App](#running-the-app)).
 6. **Generate a campaign.** `uv run run_campaign.py`, or `python3 deploy/deploy_orchestrator.py --action test`.
-7. **(Optional) Inspect A2A.** Run `bash workshop/setup_inspector.sh` to set up the A2A Inspector and view each deployed agent's card.
+7. **(Optional) Inspect A2A.** Run `bash creative-studio/setup_inspector.sh` to set up the A2A Inspector and view each deployed agent's card.
 
 ## Code Walkthrough
 
-All paths below are relative to `workshop/starter/`. Line ranges match the current code.
+All paths below are relative to `creative-studio/starter/`. Line ranges match the current code.
 
 **Specialist agents (`agents/<name>/agent.py`).** Each specialist is an ADK `Agent` exported as `root_agent`, defaulting to the `GEMINI_MODEL` env value (code fallback `gemini-2.5-flash`), and ending with an A2A server bootstrap in its `__main__` block.
 
@@ -424,18 +414,18 @@ Reference material the Copywriter draws on lives in `agents/copywriter/skills/in
 
 ```
 .
-├── docs/                       The published codelab (claat HTML), the GitHub Pages source
-│   ├── index.html              The codelab content (plus copy-button and dark-mode enhancements)
-│   ├── codelab.json            Codelab metadata
+├── docs/                       The published guide (claat HTML), the GitHub Pages source
+│   ├── index.html              The guide content (plus copy-button and dark-mode enhancements)
+│   ├── codelab.json            Guide metadata
 │   ├── .nojekyll               Serve files as-is on GitHub Pages
-│   └── img/                    Codelab images (referenced with relative paths)
+│   └── img/                    Guide images (referenced with relative paths)
 ├── LICENSE                     Apache License 2.0
 ├── README.md                   This file
-└── workshop/
-    ├── README.md               Workshop facilitator notes
+└── creative-studio/
+    ├── README.md               Directory overview and architecture notes
     ├── setup_inspector.sh       Sets up the A2A Inspector for debugging agent cards
     ├── diagrams/               Screenshots, GIFs, and the architecture diagram
-    └── starter/                Participant starting point (guided TODOs)
+    └── starter/                Application source
         ├── .env.example         Configuration template
         ├── pyproject.toml       Root dependencies (Python >=3.11)
         ├── run_campaign.py      Runs an end-to-end campaign against the deployed orchestrator
@@ -464,18 +454,18 @@ A dedicated `SECURITY.md` describes how to report a vulnerability: see [SECURITY
 
 ## Contributing
 
-This is a fork of an educational codelab; contributions that improve clarity, fix bugs in the starter, or extend the workshop are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request, and keep changes focused and well described.
+Contributions that improve clarity, fix bugs, or extend functionality are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request, and keep changes focused and well described.
 
 ## License
 
-Licensed under the Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). The original codelab copyright is retained and modifications are noted alongside it, as required by the license.
+Licensed under the Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). The original codelab copyright is retained, as required by the license.
 
 ## Acknowledgments
 
-- **Original codelab** by Saoussen Chaabnia and Mete Atamel, adapted and maintained here by Animesh.
+- **Original codelab** by Saoussen Chaabnia and Mete Atamel.
 - **[Google ADK](https://google.github.io/adk-docs/)** for the agent framework, Skills, and A2A server support.
 - **[A2A protocol](https://github.com/a2aproject)** and the **[A2A Inspector](https://github.com/a2aproject/a2a-inspector)** for agent-to-agent communication and debugging.
 - **[Model Context Protocol](https://modelcontextprotocol.io/)** and the **[Notion MCP server](https://github.com/makenotion/notion-mcp-server)** for the project-tracking integration.
 - **Gemini models on Vertex AI** for text and native image generation.
 - **Google Cloud** (Cloud Run, Vertex AI Agent Engine, Cloud Storage, Secret Manager) for the runtime.
-- **[`claat`](https://github.com/googlecodelabs/tools)** for generating the static codelab in `docs/`.
+- **[`claat`](https://github.com/googlecodelabs/tools)** for generating the static guide in `docs/`.

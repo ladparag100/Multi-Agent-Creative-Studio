@@ -26,7 +26,7 @@
                   id="ai-creative-studio-adk-a2a"
                   title="Build a Multi-Agent Creative Studio with Google&#39;s Agent Stack: ADK, A2A, MCP on Cloud Run &amp; Agent Runtime"
                   environment="web"
-                  feedback-link="https://github.com/ANI-IN/Multi-Agent-Creative-Studio/issues/new?title=[ai-creative-studio-adk-a2a]">
+                  feedback-link="https://github.com/ladparag100/Multi-Agent-Creative-Studio/issues/new?title=[ai-creative-studio-adk-a2a]">
     
       <google-codelab-step label="Overview" duration="5">
         <div style="border:1px solid #dadce0;border-radius:8px;padding:24px 24px 20px;margin:0 0 24px 0;font-family:'Google Sans',Roboto,sans-serif;">
@@ -38,7 +38,7 @@
           </div>
           <div style="display:flex;align-items:center;color:#5f6368;font-size:14px;">
             <svg style="margin-right:12px;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <span>Written by Animesh, adapted from a codelab by Saoussen Chaabnia &amp; Mete Atamel</span>
+            <span>Adapted from a codelab by Saoussen Chaabnia &amp; Mete Atamel</span>
           </div>
         </div>
 
@@ -113,7 +113,7 @@
 <p>Then click <strong>Authorize</strong> to allow Cloud Shell to make Google Cloud API calls:</p>
 <p class="image-container"><img alt="Authorize Cloud Shell dialog" src="img/bbdea606f92e0538.jpg"></p>
 <p>Cloud Shell is now ready. You&#39;ll see a welcome message in the terminal: <img alt="Cloud Shell terminal ready" src="img/fb54797b2d4b65ad.jpg"></p>
-<aside class="warning"><p><strong>Note:</strong> If Cloud Shell goes idle for 20 minutes it will disconnect. If this happens, reconnect and <code>cd ~/ai-creative-studio/workshop/starter</code> to return to the working directory.</p>
+<aside class="warning"><p><strong>Note:</strong> If Cloud Shell goes idle for 20 minutes it will disconnect. If this happens, reconnect and <code>cd ~/ai-creative-studio/creative-studio/starter</code> to return to the working directory.</p>
 </aside>
 <h2 is-upgraded>Authenticate and configure your project</h2>
 <p>Cloud Shell is already authenticated with your Google account. Confirm your active account and find your Project ID:</p>
@@ -155,8 +155,8 @@ echo &#34;Project: $PROJECT_ID&#34;
 </aside>
 <h2 is-upgraded>Clone the starter repository</h2>
 <p>This codelab uses a <strong>starter repository</strong> - a skeleton project with all the infrastructure in place (Dockerfiles, pyproject.toml, deploy scripts) but with the agent logic left for you to write.</p>
-<pre><code language="language-bash" class="language-bash">git clone https://github.com/ANI-IN/Multi-Agent-Creative-Studio.git ~/ai-creative-studio
-cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">git clone https://github.com/ladparag100/Multi-Agent-Creative-Studio.git ~/ai-creative-studio
+cd ~/ai-creative-studio/creative-studio/starter
 </code></pre>
 <p>Each <code>agent.py</code> contains <code># TODO</code> placeholders where you will write the agent logic. The <code>Dockerfile</code>, <code>pyproject.toml</code>, and deploy scripts are already complete.</p>
 <h2 is-upgraded>Configure environment variables</h2>
@@ -217,7 +217,7 @@ grep -q &#34;^GOOGLE_CLOUD_PROJECT_NUMBER&#34; .env \
 <pre><code language="language-bash" class="language-bash">uv sync
 </code></pre>
 <p>The <code>uv sync</code> command reads <code>pyproject.toml</code> and creates a <code>.venv/</code> directory with all dependencies. Each specialist also has its own <code>pyproject.toml</code> used exclusively by Docker builds - the shared install above covers everything you need for local testing.</p>
-<aside class="special"><p><strong>No manual activation needed.</strong> All commands in this codelab use <code>uv run</code>, which automatically activates the <code>.venv</code> in <code>~/ai-creative-studio/workshop/starter/</code>. Just <code>cd</code> to the <code>starter</code> directory and prefix your command with <code>uv run</code>.</p>
+<aside class="special"><p><strong>No manual activation needed.</strong> All commands in this codelab use <code>uv run</code>, which automatically activates the <code>.venv</code> in <code>~/ai-creative-studio/creative-studio/starter/</code>. Just <code>cd</code> to the <code>starter</code> directory and prefix your command with <code>uv run</code>.</p>
 </aside>
 
 
@@ -359,7 +359,7 @@ Format your output as:
 </code></pre>
 <aside class="special"><p><strong>Why </strong><strong><code>--allow_origins='*'</code></strong><strong>?</strong> Cloud Shell&#39;s Web Preview proxies your local server through a <code>*.cloudshell.dev</code> URL, which is a different origin than <code>127.0.0.1</code>. Without this flag, the dev UI gets blocked by CORS when creating a session and you&#39;ll see <code>403 Forbidden</code> errors. The flag whitelists all origins - safe for local development.</p>
 </aside>
-<aside class="warning"><p><strong>&#34;No agents found in current folder&#34;?</strong> Make sure you ran the command from <code>~/ai-creative-studio/workshop/starter</code> (not from inside <code>agents/</code>). The <code>agents</code> argument tells <code>adk web</code> where to look.</p>
+<aside class="warning"><p><strong>&#34;No agents found in current folder&#34;?</strong> Make sure you ran the command from <code>~/ai-creative-studio/creative-studio/starter</code> (not from inside <code>agents/</code>). The <code>agents</code> argument tells <code>adk web</code> where to look.</p>
 </aside>
 <p>You&#39;ll see:</p>
 <pre><code language="language-text" class="language-text">INFO: Started server process
@@ -976,28 +976,28 @@ uvicorn.run(a2a_app, host=HOST, port=PORT)
 <p>Open <strong>5 separate Cloud Shell terminals</strong> (click the <code>+</code> icon in the terminal tab bar) and run one agent per terminal.</p>
 <p><code>uv run</code> automatically activates the <code>.venv</code> - no manual <code>source</code> needed in each terminal.</p>
 <p><strong>Terminal 1 - Brand Strategist (port 8082):</strong></p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 PORT=8082 uv run agents/brand_strategist/agent.py
 </code></pre>
 <p><strong>Terminal 2 - Copywriter (port 8083):</strong></p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 PORT=8083 uv run agents/copywriter/agent.py
 </code></pre>
 <p><strong>Terminal 3 - Designer (port 8084):</strong></p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 PORT=8084 uv run agents/designer/agent.py
 </code></pre>
 <p><strong>Terminal 4 - Critic (port 8085):</strong></p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 PORT=8085 uv run agents/critic/agent.py
 </code></pre>
 <p><strong>Terminal 5 - Project Manager (port 8086):</strong></p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 PORT=8086 uv run agents/project_manager/agent.py
 </code></pre>
 <h2 is-upgraded>Set localhost URLs in .env</h2>
 <p>In <strong>Terminal 6</strong>, update <code>.env</code> with the local agent URLs so the Creative Director can find them:</p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 
 sed -i \
   -e &#39;s|STRATEGIST_AGENT_URL=.*|STRATEGIST_AGENT_URL=http://localhost:8082|&#39; \
@@ -1094,7 +1094,7 @@ bash scripts/run.sh
 <p>Make sure the 5 specialist agents are still running (Terminals 1–5 from Step 10).</p>
 <p>In <strong>Terminal 6</strong> (the A2A Inspector terminal), stop the inspector with <code>Ctrl+C</code>.</p>
 <p>Open the file:</p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 cloudshell edit agents/creative_director/agent.py
 </code></pre>
 <p>This file has three TODOs. Work through them in order.</p>
@@ -1402,7 +1402,7 @@ EXPOSE 8080
 CMD [&#34;uv&#34;, &#34;run&#34;, &#34;python&#34;, &#34;agent.py&#34;]
 </code></pre>
 <h2 is-upgraded>Deploy all 5 specialists sequentially</h2>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 source .env
 
 uv run deploy/deploy_all_specialists.py
@@ -1487,7 +1487,7 @@ bash scripts/run.sh
 export REGION=&#34;us-central1&#34;
 </code></pre>
 </aside>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 source .env
 
 uv run deploy/deploy_orchestrator.py --action deploy
@@ -1601,7 +1601,7 @@ agent_engine_id = resource_name.split(&#34;/&#34;)[-1]
 </aside>
 <h2 is-upgraded>Optional: Run from the terminal</h2>
 <p>You can also run the campaign programmatically using the <code>run_campaign.py</code> script that is already included in the starter.</p>
-<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/workshop/starter
+<pre><code language="language-bash" class="language-bash">cd ~/ai-creative-studio/creative-studio/starter
 uv run run_campaign.py
 </code></pre>
 

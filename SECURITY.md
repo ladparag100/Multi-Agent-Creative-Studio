@@ -11,10 +11,10 @@ Please include enough detail to reproduce the issue and, if possible, a suggeste
 
 ## Scope and good practices
 
-This is an educational workshop project. A few things to keep in mind when running it:
+A few things to keep in mind when running this project:
 
 - Secrets (such as `NOTION_TOKEN`) belong in Google Cloud Secret Manager or a local, git-ignored `.env`, never in committed files. Only `.env.example` with placeholder values is tracked.
-- The workshop deploys specialist services with `--allow-unauthenticated` for convenience. Do not use that setting for anything beyond a throwaway workshop project; require authentication and restrict access with IAM.
+- The deploy scripts deploy specialist services with `--allow-unauthenticated` for convenience. Do not use that setting beyond local development or a throwaway project; require authentication and restrict access with IAM.
 - Use Application Default Credentials (`gcloud auth application-default login`) rather than long-lived service-account keys.
 - Generated image URLs are short-lived signed URLs (one hour by default).
 

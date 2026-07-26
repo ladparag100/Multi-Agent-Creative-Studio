@@ -7,7 +7,7 @@
   "id": "ai-creative-studio-adk-a2a",
   "duration": 108,
   "title": "Build a Multi-Agent Creative Studio with Google's Agent Stack: ADK, A2A, MCP on Cloud Run \u0026 Agent Runtime",
-  "authors": "Animesh (adapted from a codelab by Saoussen Chaabnia \u0026 Mete Atamel)",
+  "authors": "Adapted from a codelab by Saoussen Chaabnia \u0026 Mete Atamel",
   "summary": "Build a distributed multimodal multi-agent system using ADK, Skills, A2A, MCP, Cloud Run, and Gemini Enterprise Agent Platform Runtime",
   "source": "index.lab.md",
   "theme": "",
@@ -22,7 +22,7 @@
   "tags": [
     "web"
   ],
-  "feedback": "https://github.com/ANI-IN/Multi-Agent-Creative-Studio/issues/new?title=[ai-creative-studio-adk-a2a]",
+  "feedback": "https://github.com/ladparag100/Multi-Agent-Creative-Studio/issues/new?title=[ai-creative-studio-adk-a2a]",
   "ga": "",
   "url": "ai-creative-studio-adk-a2a"
 }

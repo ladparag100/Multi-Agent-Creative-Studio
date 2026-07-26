@@ -1,23 +1,23 @@
-# AI Creative Studio: Workshop
+# AI Creative Studio
 
 ## Build a Multi-Agent Creative Studio with Google's Agent Stack: ADK, A2A, MCP on Cloud Run & Agent Runtime
 
-This directory contains all the materials for the hands-on workshop codelab.
+This directory contains the application code.
 
 ### Directory Structure
 
 ```
-workshop/
-├── diagrams/               # Screenshots and GIFs used in the codelab
+creative-studio/
+├── diagrams/               # Screenshots and GIFs used in the guide
 ├── setup_inspector.sh      # A2A Inspector setup helper
-└── starter/                # Starter code given to participants
-    ├── agents/             # Agent stubs with TODO comments
+└── starter/                # Application source
+    ├── agents/             # Agent implementations
     └── deploy/             # Deployment scripts
 ```
 
-> The published codelab lives in the `docs/` directory at the **repository root** (a sibling of `workshop/`, not inside it).
+> The published guide lives in the `docs/` directory at the **repository root** (a sibling of `creative-studio/`, not inside it).
 
-### What Participants Build
+### What It Builds
 
 A distributed multimodal multi-agent system for Instagram campaign generation:
 
@@ -64,31 +64,19 @@ sequenceDiagram
     CD-->>User: Complete Instagram campaign
 ```
 
-### Workshop Details
-
-| | |
-|---|---|
-| **Duration** | ~2.5 hours |
-| **Level** | Intermediate |
-| **Environment** | GCP Cloud Shell |
-| **Topics** | Google ADK, ADK Skills, A2A Protocol, MCP, Multimodal, Cloud Run, Gemini Enterprise Agent Platform Runtime |
-
-### Prerequisites for Participants
+### Prerequisites
 
 - Google Cloud project with billing enabled
 - Owner or Editor IAM role
 - (Optional) Notion account for MCP integration
 
-### Starter Code
+### Source Layout
 
-The `starter/` directory contains the code participants start from:
+The `starter/` directory contains the application:
 
-- Agent files have numbered `# TODO` comments guiding participants through each implementation step
-- Deploy scripts are fully functional; participants only implement agent logic
-- Pre-written infrastructure includes retry config, error handling callbacks, and MCP toolset setup
+- `agents/` holds each specialist's implementation
+- `deploy/` holds deploy scripts, retry config, error-handling callbacks, and MCP toolset setup
 
-### Published Codelab
+### Published Guide
 
-The codelab is published via GitHub Pages at [ani-in.github.io/Multi-Agent-Creative-Studio](https://ani-in.github.io/Multi-Agent-Creative-Studio/).
-
-The `docs/` directory (at the repository root) is the GitHub Pages source. Commit changes there to publish updates.
+The `docs/` directory (at the repository root) is the GitHub Pages source for the published guide. Commit changes there to publish updates.

@@ -1,12 +1,11 @@
 AI Creative Studio
 
-This project is a derivative work, adapted and maintained by Animesh.
-It is based on the codelab "Build a Multi-Agent Creative Studio with
-Google's Agent Stack: ADK, A2A, MCP on Cloud Run & Agent Runtime,"
-originally created by Saoussen Chaabnia and Mete Atamel.
+This project is a derivative work based on the codelab "Build a
+Multi-Agent Creative Studio with Google's Agent Stack: ADK, A2A, MCP
+on Cloud Run & Agent Runtime," originally created by Saoussen Chaabnia
+and Mete Atamel.
 
 Licensed under the Apache License, Version 2.0. The original copyright
 notices are retained in LICENSE and in the source file headers.
 
 Portions Copyright 2026 Saoussen Chaabnia.
-Modifications Copyright 2026 Animesh.

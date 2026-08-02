@@ -39,7 +39,11 @@ def _load_secrets_into_env():
     agent module is imported. No-op locally when no secrets.toml exists
     (.env covers that)."""
     try:
+        # st.secrets parses secrets.toml lazily - accessing the object itself
+        # never raises, so force the parse here (inside the try) rather than
+        # in the loop below, where it would go uncaught.
         secrets = st.secrets
+        available = set(secrets.keys())
     except Exception:
         return
 
@@ -51,7 +55,7 @@ def _load_secrets_into_env():
         "CRITIC_AGENT_URL", "PM_AGENT_URL",
         "NOTION_TOKEN", "NOTION_PROJECT_DATABASE_ID", "NOTION_TASKS_DATABASE_ID",
     ):
-        if key in secrets:
+        if key in available:
             os.environ[key] = str(secrets[key])
 
 
@@ -88,14 +92,63 @@ _TRANSIENT_RETRY_RE = re.compile(
     re.IGNORECASE | re.MULTILINE,
 )
 
-EXAMPLE_BRIEF = """Create a complete Instagram campaign for:
-- Product: EcoFlow Smart Water Bottle (tracks hydration, keeps drinks cold 24h)
-- Target Audience: Health-conscious millennials, 25-35 years old
-- Platform: Instagram
-- Goal: Brand awareness + drive website traffic
-- Brand Voice: Motivational, clean, science-backed
+ECOFLOW_BRIEF = """Create a complete Instagram campaign for:
+- Product: EcoFlow Smart Water Bottle - an insulated stainless steel bottle with a
+  built-in hydration sensor that tracks intake via a companion app over Bluetooth,
+  keeps drinks cold for 24 hours or hot for 12. Available in 3 colors, retails at $45.
+- Target Audience: Health-conscious millennials, 25-35 years old, urban and suburban
+  gym-goers and remote workers who like data-driven self-improvement and wellness habits.
+- Platform: Instagram (feed posts and Stories)
+- Goal: Brand awareness and drive traffic to the website for the pre-order launch
+- Key differentiators: Real-time hydration tracking, 24h cold retention, sleek
+  minimalist design, app integration with drink reminders
+- Brand Voice: Motivational, clean, science-backed, no-nonsense wellness tone
 - Budget: $3,000
-- Timeline: Launch in 2 weeks"""
+- Timeline: Launch in 2 weeks; pre-order window is open now
+- Offer: 15% off pre-orders, free shipping over $50"""
+
+COLDBREW_BRIEF = """Create a complete Instagram campaign for:
+- Product: Roast & Root - a small-batch, single-origin cold brew coffee roastery known
+  for slow-steeped (18-hour), low-acid cold brew concentrate sold in reusable glass
+  bottles. Holiday gift sets pair a bottle with a reusable glass tumbler and a tasting
+  notes card.
+- Target Audience: Young professionals, 24-38 years old, coffee enthusiasts and gift
+  shoppers looking for thoughtful artisanal presents; urban dwellers who value
+  sustainability and small-batch/local craft goods.
+- Platform: Instagram (feed posts plus Reels for unboxing and gifting moments)
+- Goal: Drive holiday gift-set sales during the November-December gifting season
+- Key differentiators: Single-origin beans, 18-hour slow-steeped process, reusable
+  and sustainable packaging, small-batch local roaster story
+- Brand Voice: Cozy, indulgent, warm, a little playful - coffee as a treat-yourself
+  or gift-someone-you-love moment
+- Budget: $2,000
+- Timeline: 4-week campaign leading up to the holidays; gift sets ship by Dec 20
+- Offer: Buy 2 gift sets, get a free tasting-notes card set; limited holiday packaging"""
+
+SHELTER_BRIEF = """Create a complete Instagram campaign for:
+- Cause: Paws & Home - a local no-kill animal shelter currently housing 40+ dogs and
+  cats awaiting adoption, running a "Home for the Holidays" adoption drive.
+- Target Audience: Local community members, 22-55 years old, within a 30-mile radius;
+  animal lovers and families considering pet adoption, plus existing shelter donors
+  and volunteers.
+- Platform: Instagram (feed posts featuring adoptable pets, plus Stories/Reels for
+  shelter tours and individual pet profiles)
+- Goal: Increase adoption applications and one-time or recurring donations during the
+  holiday season
+- Key details: Adoption fees waived this month for senior pets (5+ years); the shelter
+  covers the first vet visit and microchipping; volunteers needed for weekend events
+- Brand Voice: Warm, emotional, hopeful, community-focused - heartfelt and uplifting,
+  not guilt-driven
+- Budget: $800 (small nonprofit budget)
+- Timeline: 3-week campaign culminating in a weekend adoption fair
+- Offer: Waived adoption fees for pets 5+ years old; a $25 minimum donation covers one
+  pet's vaccinations"""
+
+EXAMPLE_CAMPAIGNS = [
+    ("💧 EcoFlow Water Bottle", ECOFLOW_BRIEF),
+    ("☕ Roast & Root Cold Brew (holiday gift set)", COLDBREW_BRIEF),
+    ("🐾 Paws & Home Shelter (adoption drive)", SHELTER_BRIEF),
+]
 
 
 def run_async(coro):
@@ -226,6 +279,21 @@ async def stream_campaign(runner, session_id, message_text, activity, live, acti
     return turn_content
 
 
+def _is_malformed_function_call(turn_content) -> bool:
+    """True if the turn ended in Gemini's MALFORMED_FUNCTION_CALL finish reason.
+
+    This is a transient generation quirk - the model occasionally fails to
+    serialize a function call with very long/punctuation-heavy string
+    arguments (e.g. a full campaign brief passed to a specialist tool). It is
+    not a real failure, so it is worth silently retrying the same turn rather
+    than surfacing it to the user.
+    """
+    return any(
+        item["type"] == "text" and "Malformed function call" in item["text"]
+        for item in turn_content
+    )
+
+
 def render_history_message(msg):
     if msg["role"] == "user":
         with st.chat_message("user"):
@@ -286,13 +354,13 @@ for msg in st.session_state.messages:
     render_history_message(msg)
 
 if not st.session_state.messages:
-    st.info(
-        "Try a full campaign brief, or a simple request like *'just do market research "
-        "for a cold brew coffee brand'*."
-    )
-    if st.button("Use example campaign brief"):
-        st.session_state.prefill = EXAMPLE_BRIEF
-        st.rerun()
+    st.info("Describe your own campaign below, or try one of these example briefs:")
+    cols = st.columns(len(EXAMPLE_CAMPAIGNS))
+    for col, (label, brief) in zip(cols, EXAMPLE_CAMPAIGNS):
+        with col:
+            if st.button(label, width="stretch"):
+                st.session_state.prefill = brief
+                st.rerun()
 
 prompt = st.chat_input("Describe your campaign, or ask for a revision...")
 if "prefill" in st.session_state:
@@ -318,6 +386,24 @@ if prompt:
                     activity_lines,
                 )
             )
+
+            retries = 0
+            max_retries = 2
+            while _is_malformed_function_call(turn_content) and retries < max_retries:
+                retries += 1
+                line = f"⚠️ Model produced a malformed function call, retrying ({retries}/{max_retries})..."
+                activity_lines.append(line)
+                activity_box.write(line)
+                turn_content = run_async(
+                    stream_campaign(
+                        get_runner(),
+                        st.session_state.session_id,
+                        prompt,
+                        activity_box,
+                        live_area,
+                        activity_lines,
+                    )
+                )
 
     st.session_state.messages.append(
         {

@@ -9,3 +9,6 @@ Licensed under the Apache License, Version 2.0. The original copyright
 notices are retained in LICENSE and in the source file headers.
 
 Portions Copyright 2026 Saoussen Chaabnia.
+
+Additional contributions (Streamlit UI, Cloud Run deployment, and
+related fixes) by Parag Lad.

@@ -462,6 +462,7 @@ Licensed under the Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTIC
 
 ## Acknowledgments
 
+- **Contributor**: Parag Lad ([@ladparag100](https://github.com/ladparag100)) — Streamlit UI, Cloud Run deployment, and various fixes on top of the original codelab.
 - **Original codelab** by Saoussen Chaabnia and Mete Atamel.
 - **[Google ADK](https://google.github.io/adk-docs/)** for the agent framework, Skills, and A2A server support.
 - **[A2A protocol](https://github.com/a2aproject)** and the **[A2A Inspector](https://github.com/a2aproject/a2a-inspector)** for agent-to-agent communication and debugging.

@@ -441,24 +441,6 @@ Reference material the Copywriter draws on lives in `agents/copywriter/skills/in
             ├── deploy_orchestrator.py      Deploy the orchestrator to Agent Engine
             ├── env_utils.py                Load and validate .env, rewrite agent URLs
             └── teardown_gcp.sh             Delete all provisioned cloud resources
-```
-
-## Security Notes
-
-- **Secrets** (the Notion token and database IDs) are stored in Google Cloud **Secret Manager** at deploy time, never committed. `.env` is for local development and is git-ignored; only `.env.example` (with placeholders) is tracked.
-- **Application Default Credentials** drive local access; do not commit service-account keys. Use `gcloud auth application-default login`.
-- **Public endpoints.** The workshop deploys specialists with `--allow-unauthenticated` for simplicity. For anything beyond a workshop, require authentication and put the services behind IAM or an API gateway.
-- **Signed URLs** for images are short-lived (one hour) and minted on demand (`get_image_links_tool.py:L7-L96`).
-
-A dedicated `SECURITY.md` describes how to report a vulnerability: see [SECURITY.md](SECURITY.md).
-
-## Contributing
-
-Contributions that improve clarity, fix bugs, or extend functionality are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request, and keep changes focused and well described.
-
-## License
-
-Licensed under the Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). The original codelab copyright is retained, as required by the license.
 
 ## Acknowledgments
 
